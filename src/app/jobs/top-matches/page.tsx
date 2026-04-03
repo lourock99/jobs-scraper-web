@@ -141,4 +141,4 @@ export default async function TopMatchesPage({
 }
 
 // Optional: Add revalidation if needed
-export const revalidate = 3600; // Revalidate once per hour
+export const revalidate = 0; // Revalidate once per hour

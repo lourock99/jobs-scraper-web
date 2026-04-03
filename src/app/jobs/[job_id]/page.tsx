@@ -77,4 +77,4 @@ export default async function JobDetailPage({ params }: PageProps) {
 }
 
 // Optional: Add revalidation if job data can change frequently
-// export const revalidate = 3600; // Revalidate every hour
+// export const revalidate = 0; // Revalidate every hour

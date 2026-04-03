@@ -43,6 +43,15 @@ export default async function NewJobsPage({
   const minScore = minScoreParam ? parseInt(minScoreParam) : undefined;
   const maxScore = maxScoreParam ? parseInt(maxScoreParam) : undefined;
 
+  // Get score status filter ("pending" = unscored, "scored" = has score)
+  const scoreStatus = params?.scoreStatus as string | undefined;
+
+  // Get resume score stage filter ("initial" or "custom") — used with scoreStatus=scored
+  const resumeScoreStage = params?.resumeScoreStage as string | undefined;
+
+  // Get custom resume filter ("true" = has custom resume, "false" = no custom resume)
+  const customResume = params?.customResume as string | undefined;
+
   // Fetch the jobs for the current page
   const newJobs: Job[] = await getNewJobs(
     currentPage,
@@ -50,8 +59,11 @@ export default async function NewJobsPage({
     providerFilter,
     minScore,
     maxScore,
-    interestFilter, // Pass interestFilter
-    searchQuery // Pass searchQuery
+    interestFilter,
+    searchQuery,
+    scoreStatus,
+    resumeScoreStage,
+    customResume
   );
 
   // Fetch total count
@@ -59,8 +71,11 @@ export default async function NewJobsPage({
     providerFilter,
     minScore,
     maxScore,
-    interestFilter, // Pass interestFilter
-    searchQuery // Pass searchQuery
+    interestFilter,
+    searchQuery,
+    scoreStatus,
+    resumeScoreStage,
+    customResume
   );
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -96,4 +111,4 @@ export default async function NewJobsPage({
 }
 
 // Optional: Add revalidation if needed
-export const revalidate = 3600; // Revalidate once per hour
+export const revalidate = 0; // Revalidate once per hour

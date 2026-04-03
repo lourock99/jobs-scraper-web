@@ -12,7 +12,6 @@ interface FilterOption {
 const PROVIDER_OPTIONS: FilterOption[] = [
   { value: "all", label: "All Providers" },
   { value: "linkedin", label: "LinkedIn" },
-  { value: "careers_future", label: "Careers Future" },
   { value: "jsearch", label: "JSearch" },
   { value: "usajobs", label: "USAJobs" },
 ];

@@ -5,6 +5,7 @@ export interface Job {
   job_title: string;
   level: string;
   location: string;
+  country?: string | null;
   description: string;
   status: string;
   is_active: boolean;

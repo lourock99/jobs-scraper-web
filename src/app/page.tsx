@@ -11,7 +11,8 @@ import {
   getScoredWithOriginalResumeCount,
   getScoredWithCustomResumeCount,
   getLinkedInJobsCount,
-  getCareersFutureJobsCount,
+  getJSearchJobsCount,
+  getUSAJobsJobsCount,
   getAppliedJobsCountByDate, // Added import
 } from "@/lib/supabase/queries";
 import {
@@ -87,7 +88,8 @@ export default async function Home() {
     await getScoredWithOriginalResumeCount();
   const scoredWithCustomResumeCount = await getScoredWithCustomResumeCount();
   const linkedInJobsCount = await getLinkedInJobsCount();
-  const careersFutureJobsCount = await getCareersFutureJobsCount();
+  const jSearchJobsCount = await getJSearchJobsCount();
+  const usaJobsCount = await getUSAJobsJobsCount();
 
   // Get server's current local date in YYYY-MM-DD format
   const now = new Date(); // Current date/time in server's local timezone
@@ -157,7 +159,7 @@ export default async function Home() {
       title: "Pending Scoring",
       value: pendingScoreJobsCount,
       icon: <FileClock size={20} />,
-      href: "/jobs/new",
+      href: "/jobs/new?scoreStatus=pending",
       description: "Active new jobs awaiting resume score.",
       color: "bg-sky-500",
     },
@@ -165,7 +167,7 @@ export default async function Home() {
       title: "Scored Jobs",
       value: scoredJobsCount,
       icon: <FileCheck size={20} />,
-      href: "/jobs/top-matches",
+      href: "/jobs/new?scoreStatus=scored",
       description: "Active new jobs that have a resume score.",
       color: "bg-violet-500",
     },
@@ -173,7 +175,7 @@ export default async function Home() {
       title: "Scored (Original)",
       value: scoredWithOriginalResumeCount,
       icon: <FileUp size={20} />,
-      href: "/jobs/top-matches",
+      href: "/jobs/new?scoreStatus=scored&resumeScoreStage=initial",
       description: "Jobs scored using the original resume.",
       color: "bg-blue-500",
     },
@@ -181,7 +183,7 @@ export default async function Home() {
       title: "Scored (Custom)",
       value: scoredWithCustomResumeCount,
       icon: <FileSignature size={20} />,
-      href: "/jobs/top-matches",
+      href: "/jobs/new?scoreStatus=scored&resumeScoreStage=custom",
       description: "Jobs scored using a customized resume.",
       color: "bg-purple-500",
     },
@@ -189,7 +191,7 @@ export default async function Home() {
       title: "Custom Resumes",
       value: customResumeJobsCount,
       icon: <FileText size={20} />,
-      href: "/",
+      href: "/jobs/new?customResume=true",
       description: "Jobs with a generated custom resume.",
       color: "bg-emerald-500",
     },
@@ -197,25 +199,41 @@ export default async function Home() {
       title: "No Custom Resumes",
       value: noCustomResumeJobsCount,
       icon: <FileX size={20} />,
-      href: "/jobs/new",
+      href: "/jobs/new?customResume=false",
       description: "Active jobs without a custom resume.",
       color: "bg-rose-500",
+    },
+    {
+      title: "All Sources",
+      value: linkedInJobsCount + jSearchJobsCount + usaJobsCount,
+      icon: <Briefcase size={20} />,
+      href: "/jobs/new",
+      description: "Active jobs from all sources (LinkedIn, JSearch, USAJobs).",
+      color: "bg-slate-500",
     },
     {
       title: "LinkedIn Jobs",
       value: linkedInJobsCount,
       icon: <Linkedin size={20} />,
-      href: "/jobs/new",
+      href: "/jobs/new?provider=linkedin",
       description: "Active LinkedIn jobs.",
       color: "bg-cyan-500",
     },
     {
-      title: "CareersFuture Jobs",
-      value: careersFutureJobsCount,
+      title: "JSearch Jobs",
+      value: jSearchJobsCount,
       icon: <SquareKanban size={20} />,
-      href: "/jobs/new",
-      description: "Active Careers Future jobs.",
-      color: "bg-teal-500",
+      href: "/jobs/new?provider=jsearch",
+      description: "Active JSearch jobs.",
+      color: "bg-orange-500",
+    },
+    {
+      title: "USAJobs",
+      value: usaJobsCount,
+      icon: <Briefcase size={20} />,
+      href: "/jobs/new?provider=usajobs",
+      description: "Active USAJobs listings.",
+      color: "bg-red-500",
     },
   ];
 
