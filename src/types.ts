@@ -1,4 +1,33 @@
 // Define basic types (you can refine these later based on your actual table structure)
+export type JobStatus =
+  | 'pending'
+  | 'pre_filtered'
+  | 'new'
+  | 'evaluated'
+  | 'applied'
+  | 'responded'
+  | 'interview'
+  | 'offer'
+  | 'rejected'
+  | 'discarded'
+  | 'expired'
+  | 'removed'
+  | 'skip';
+
+export type LegitimacyTier =
+  | 'High Confidence'
+  | 'Proceed with Caution'
+  | 'Suspicious';
+
+export interface ScoreDimensions {
+  cv_match?: number;
+  north_star?: number;
+  comp?: number;
+  culture?: number;
+  red_flags?: number;
+  global?: number;
+}
+
 export interface Job {
   job_id: string;
   company: string;
@@ -7,7 +36,7 @@ export interface Job {
   location: string;
   country?: string | null;
   description: string;
-  status: string;
+  status: JobStatus | string;
   is_active: boolean;
   application_date: string;
   resume_score?: number;
@@ -21,6 +50,13 @@ export interface Job {
   customized_resumes?: Resume | null;
   resume_link?: string | null;
   provider: string;
+  url?: string | null;
+  evaluation_report?: string | null;
+  legitimacy_tier?: LegitimacyTier | string | null;
+  archetype?: string | null;
+  score_dimensions?: ScoreDimensions | null;
+  report_date?: string | null;
+  posted_at?: string | null;
 }
 
 // --- Resume Related Interfaces ---

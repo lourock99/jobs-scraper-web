@@ -13,7 +13,15 @@ import {
   getLinkedInJobsCount,
   getJSearchJobsCount,
   getUSAJobsJobsCount,
-  getAppliedJobsCountByDate, // Added import
+  getAppliedJobsCountByDate,
+  getPendingEvalJobsCount,
+  getEvaluatedJobsCount,
+  getWithReportCount,
+  getPreFilteredCount,
+  getGreenhouseJobsCount,
+  getAshbyJobsCount,
+  getLeverJobsCount,
+  getCareersFutureJobsCount,
 } from "@/lib/supabase/queries";
 import {
   Briefcase,
@@ -29,7 +37,14 @@ import {
   FileSignature,
   Linkedin,
   SquareKanban,
-  CalendarCheck, // Added import for a new icon
+  CalendarCheck,
+  ClipboardList,
+  BarChart3,
+  FileBarChart,
+  Filter,
+  Building2,
+  Layers,
+  Globe,
 } from "lucide-react";
 
 interface StatCardProps {
@@ -90,6 +105,14 @@ export default async function Home() {
   const linkedInJobsCount = await getLinkedInJobsCount();
   const jSearchJobsCount = await getJSearchJobsCount();
   const usaJobsCount = await getUSAJobsJobsCount();
+  const pendingEvalCount = await getPendingEvalJobsCount();
+  const evaluatedCount = await getEvaluatedJobsCount();
+  const withReportCount = await getWithReportCount();
+  const preFilteredCount = await getPreFilteredCount();
+  const greenhouseCount = await getGreenhouseJobsCount();
+  const ashbyCount = await getAshbyJobsCount();
+  const leverCount = await getLeverJobsCount();
+  const careersFutureCount = await getCareersFutureJobsCount();
 
   // Get server's current local date in YYYY-MM-DD format
   const now = new Date(); // Current date/time in server's local timezone
@@ -203,12 +226,53 @@ export default async function Home() {
       description: "Active jobs without a custom resume.",
       color: "bg-rose-500",
     },
+    // --- Career-Ops Evaluation Pipeline ---
+    {
+      title: "Pending Evaluation",
+      value: pendingEvalCount,
+      icon: <ClipboardList size={20} />,
+      href: "/jobs/new",
+      description: "Jobs from scanner awaiting A-G evaluation.",
+      color: "bg-amber-600",
+    },
+    {
+      title: "Evaluated",
+      value: evaluatedCount,
+      icon: <BarChart3 size={20} />,
+      href: "/jobs/new",
+      description: "Jobs with completed A-G evaluation.",
+      color: "bg-teal-500",
+    },
+    {
+      title: "With Report",
+      value: withReportCount,
+      icon: <FileBarChart size={20} />,
+      href: "/jobs/new",
+      description: "Jobs that have an A-G evaluation report.",
+      color: "bg-violet-600",
+    },
+    {
+      title: "Pre-Filtered",
+      value: preFilteredCount,
+      icon: <Filter size={20} />,
+      href: "/jobs/new",
+      description: "Jobs filtered out as irrelevant during pre-filter.",
+      color: "bg-stone-500",
+    },
+    // --- Sources ---
     {
       title: "All Sources",
-      value: linkedInJobsCount + jSearchJobsCount + usaJobsCount,
+      value:
+        linkedInJobsCount +
+        jSearchJobsCount +
+        usaJobsCount +
+        greenhouseCount +
+        ashbyCount +
+        leverCount +
+        careersFutureCount,
       icon: <Briefcase size={20} />,
       href: "/jobs/new",
-      description: "Active jobs from all sources (LinkedIn, JSearch, USAJobs).",
+      description: "Active jobs across all providers.",
       color: "bg-slate-500",
     },
     {
@@ -234,6 +298,38 @@ export default async function Home() {
       href: "/jobs/new?provider=usajobs",
       description: "Active USAJobs listings.",
       color: "bg-red-500",
+    },
+    {
+      title: "Greenhouse",
+      value: greenhouseCount,
+      icon: <Building2 size={20} />,
+      href: "/jobs/new?provider=greenhouse",
+      description: "Active Greenhouse ATS jobs.",
+      color: "bg-lime-600",
+    },
+    {
+      title: "Ashby",
+      value: ashbyCount,
+      icon: <Layers size={20} />,
+      href: "/jobs/new?provider=ashby",
+      description: "Active Ashby ATS jobs.",
+      color: "bg-fuchsia-500",
+    },
+    {
+      title: "Lever",
+      value: leverCount,
+      icon: <Globe size={20} />,
+      href: "/jobs/new?provider=lever",
+      description: "Active Lever ATS jobs.",
+      color: "bg-yellow-600",
+    },
+    {
+      title: "CareersFuture",
+      value: careersFutureCount,
+      icon: <Globe size={20} />,
+      href: "/jobs/new?provider=careers_future",
+      description: "Active MyCareersFuture jobs.",
+      color: "bg-blue-600",
     },
   ];
 

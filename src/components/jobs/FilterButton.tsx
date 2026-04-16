@@ -14,6 +14,10 @@ const PROVIDER_OPTIONS: FilterOption[] = [
   { value: "linkedin", label: "LinkedIn" },
   { value: "jsearch", label: "JSearch" },
   { value: "usajobs", label: "USAJobs" },
+  { value: "greenhouse", label: "Greenhouse" },
+  { value: "ashby", label: "Ashby" },
+  { value: "lever", label: "Lever" },
+  { value: "careers_future", label: "MyCareersFuture" },
 ];
 
 const INTEREST_OPTIONS: FilterOption[] = [
@@ -26,8 +30,9 @@ const INTEREST_OPTIONS: FilterOption[] = [
 const APPLICATION_STATUS_OPTIONS: FilterOption[] = [
   { value: "all", label: "All Application Statuses" },
   { value: "applied", label: "Applied" },
-  { value: "interviewing", label: "Interviewing" },
-  { value: "offer", label: "Offer" }, // Matched to SQL function
+  { value: "responded", label: "Responded" },
+  { value: "interview", label: "Interview" },
+  { value: "offer", label: "Offer" },
   { value: "rejected", label: "Rejected" },
 ];
 

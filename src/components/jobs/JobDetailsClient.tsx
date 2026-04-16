@@ -142,11 +142,33 @@ export default function JobDetailsClient({
 
   // Determine the job listing URL based on the provider
   let jobUrl;
-  if (job.provider === "careers_future") {
+  if (job.url) {
+    jobUrl = job.url;
+  } else if (job.provider === "careers_future") {
     jobUrl = `https://www.mycareersfuture.gov.sg/job/${job.job_id}`;
+  } else if (job.provider === "usajobs") {
+    jobUrl = `https://www.usajobs.gov/job/${job.job_id}`;
   } else {
     jobUrl = `https://www.linkedin.com/jobs/view/${job.job_id}`;
   }
+
+  // Legitimacy tier badge
+  const legitimacyColors: Record<string, string> = {
+    "High Confidence": "bg-green-100 text-green-800 border-green-200",
+    "Proceed with Caution": "bg-yellow-100 text-yellow-800 border-yellow-200",
+    Suspicious: "bg-red-100 text-red-800 border-red-200",
+  };
+
+  // Provider display name
+  const providerName: Record<string, string> = {
+    linkedin: "LinkedIn",
+    jsearch: "JSearch",
+    usajobs: "USAJobs",
+    careers_future: "MyCareersFuture",
+    greenhouse: "Greenhouse",
+    ashby: "Ashby",
+    lever: "Lever",
+  };
 
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden">
@@ -169,11 +191,34 @@ export default function JobDetailsClient({
               <div className="flex items-center">
                 <SocialLink className="h-5 w-5 mr-2 text-gray-500" />
                 <span className="capitalize">
-                  {job.provider === "careers_future"
-                    ? "MyCareersFuture"
-                    : "LinkedIn"}
+                  {providerName[job.provider] || job.provider}
                 </span>
               </div>
+            </div>
+            {/* Career-ops badges */}
+            <div className="flex flex-wrap gap-2 mt-2">
+              {job.legitimacy_tier && (
+                <span
+                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${legitimacyColors[job.legitimacy_tier] || "bg-gray-100 text-gray-800 border-gray-200"}`}
+                >
+                  {job.legitimacy_tier}
+                </span>
+              )}
+              {job.archetype && (
+                <span className="inline-flex items-center rounded-full border border-purple-200 bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
+                  {job.archetype}
+                </span>
+              )}
+              {job.status === "evaluated" && (
+                <span className="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800">
+                  Evaluated
+                </span>
+              )}
+              {job.status === "pending" && (
+                <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                  Pending Evaluation
+                </span>
+              )}
             </div>
           </div>
 
@@ -221,6 +266,16 @@ export default function JobDetailsClient({
               View Customized Resume
               <FileText size={16} className="ml-2" />
             </button>
+          )}
+
+          {job.evaluation_report && (
+            <Link
+              href={`/jobs/${job.job_id}/report`}
+              className="inline-flex items-center px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-md hover:bg-violet-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+            >
+              View A-G Report
+              <BarChart3Icon size={16} className="ml-2" />
+            </Link>
           )}
 
           {job.status !== "applied" ? (

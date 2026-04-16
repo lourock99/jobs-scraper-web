@@ -20,6 +20,27 @@ import {
 import { Job } from "@/types";
 import { useRouter } from "next/navigation";
 
+// Provider display name mapping
+const PROVIDER_NAMES: Record<string, string> = {
+  linkedin: "LinkedIn",
+  jsearch: "JSearch",
+  usajobs: "USAJobs",
+  careers_future: "MyCareersFuture",
+  greenhouse: "Greenhouse",
+  ashby: "Ashby",
+  lever: "Lever",
+};
+
+// Builds the external job listing URL for a given job
+function getJobListingUrl(job: Job): string {
+  if (job.url) return job.url;
+  if (job.provider === "careers_future")
+    return `https://www.mycareersfuture.gov.sg/job/${job.job_id}`;
+  if (job.provider === "usajobs")
+    return `https://www.usajobs.gov/job/${job.job_id}`;
+  return `https://www.linkedin.com/jobs/view/${job.job_id}`;
+}
+
 // Status options for applied jobs
 const JOB_STATUS_OPTIONS = [
   {
@@ -29,14 +50,20 @@ const JOB_STATUS_OPTIONS = [
     color: "bg-blue-100 text-blue-800 border-blue-300",
   },
   {
-    value: "interviewing",
-    label: "Interviewing",
+    value: "responded",
+    label: "Responded",
+    icon: CheckCircle2,
+    color: "bg-cyan-100 text-cyan-800 border-cyan-300",
+  },
+  {
+    value: "interview",
+    label: "Interview",
     icon: Calendar,
     color: "bg-purple-100 text-purple-800 border-purple-300",
   },
   {
-    value: "offered",
-    label: "Offered",
+    value: "offer",
+    label: "Offer",
     icon: BadgeCheck,
     color: "bg-green-100 text-green-800 border-green-300",
   },
@@ -211,16 +238,12 @@ export default function AppliedJobsList({
                       View Details
                     </Link>
                     <Link
-                      href={
-                        job.provider === "careers_future"
-                          ? `https://www.mycareersfuture.gov.sg/job/${job.job_id}`
-                          : `https://www.linkedin.com/jobs/view/${job.job_id}`
-                      }
+                      href={getJobListingUrl(job)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50 transition-colors"
                     >
-                      View Job Posting {/* <-- Changed text for clarity */}
+                      View Job Posting
                       <ExternalLink size={14} className="ml-1.5" />
                     </Link>
 

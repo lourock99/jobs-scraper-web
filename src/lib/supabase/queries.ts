@@ -306,9 +306,8 @@ export async function getAppliedJobsCount(
   applicationStatus?: string, // Add new applicationStatus parameter
 ): Promise<number> {
   const supabase = await createSupabaseServerClient();
-  // IMPORTANT: Ensure these statuses match those in your RPC and database
-  // Suggestion: Standardize to ['applied', 'interviewing', 'offered'] if 'offered' is correct
-  const appliedStatuses = ["applied", "interviewing", "offer"];
+  // Matches canonical states: applied, responded, interview, offer
+  const appliedStatuses = ["applied", "responded", "interview", "offer"];
 
   let query = supabase
     .from("jobs")
@@ -357,7 +356,7 @@ export async function getAppliedJobsCountByDate(
 ): Promise<number> {
   // localDateString is "YYYY-MM-DD", e.g., "2025-05-21" from server's local TZ
   const supabase = await createSupabaseServerClient();
-  const appliedStatuses = ["applied", "interviewing", "offer"];
+  const appliedStatuses = ["applied", "responded", "interview", "offer"];
 
   // Create a Date object representing the start of the local day (00:00:00 local time)
   // For "2025-05-21", this will be 2025-05-21T00:00:00 in the server's local timezone.
@@ -814,4 +813,182 @@ export async function getUSAJobsJobsCount(): Promise<number> {
     throw new Error(error.message);
   }
   return count ?? 0;
+}
+
+// --- Career-Ops Queries ---
+
+/**
+ * Gets the count of jobs awaiting evaluation (status='pending').
+ */
+export async function getPendingEvalJobsCount(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("jobs")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "pending")
+    .eq("is_active", true);
+
+  if (error) {
+    console.error("Supabase count error (pending eval jobs):", error);
+    throw new Error(error.message);
+  }
+  return count ?? 0;
+}
+
+/**
+ * Gets the count of evaluated jobs (status='evaluated').
+ */
+export async function getEvaluatedJobsCount(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("jobs")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "evaluated");
+
+  if (error) {
+    console.error("Supabase count error (evaluated jobs):", error);
+    throw new Error(error.message);
+  }
+  return count ?? 0;
+}
+
+/**
+ * Gets the count of jobs with an A-G evaluation report.
+ */
+export async function getWithReportCount(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("jobs")
+    .select("*", { count: "exact", head: true })
+    .not("evaluation_report", "is", null);
+
+  if (error) {
+    console.error("Supabase count error (with report):", error);
+    throw new Error(error.message);
+  }
+  return count ?? 0;
+}
+
+/**
+ * Gets the count of pre-filtered (irrelevant) jobs.
+ */
+export async function getPreFilteredCount(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("jobs")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "pre_filtered");
+
+  if (error) {
+    console.error("Supabase count error (pre-filtered):", error);
+    throw new Error(error.message);
+  }
+  return count ?? 0;
+}
+
+/**
+ * Gets the count of jobs from Greenhouse.
+ */
+export async function getGreenhouseJobsCount(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("jobs")
+    .select("*", { count: "exact", head: true })
+    .eq("provider", "greenhouse")
+    .eq("is_active", true)
+    .eq("job_state", "new");
+
+  if (error) {
+    console.error("Supabase count error (Greenhouse jobs):", error);
+    throw new Error(error.message);
+  }
+  return count ?? 0;
+}
+
+/**
+ * Gets the count of jobs from Ashby.
+ */
+export async function getAshbyJobsCount(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("jobs")
+    .select("*", { count: "exact", head: true })
+    .eq("provider", "ashby")
+    .eq("is_active", true)
+    .eq("job_state", "new");
+
+  if (error) {
+    console.error("Supabase count error (Ashby jobs):", error);
+    throw new Error(error.message);
+  }
+  return count ?? 0;
+}
+
+/**
+ * Gets the count of jobs from Lever.
+ */
+export async function getLeverJobsCount(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("jobs")
+    .select("*", { count: "exact", head: true })
+    .eq("provider", "lever")
+    .eq("is_active", true)
+    .eq("job_state", "new");
+
+  if (error) {
+    console.error("Supabase count error (Lever jobs):", error);
+    throw new Error(error.message);
+  }
+  return count ?? 0;
+}
+
+/**
+ * Gets the count of jobs from MyCareersFuture.
+ */
+export async function getCareersFutureJobsCount(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("jobs")
+    .select("*", { count: "exact", head: true })
+    .eq("provider", "careers_future")
+    .eq("is_active", true)
+    .eq("job_state", "new");
+
+  if (error) {
+    console.error("Supabase count error (CareersFuture jobs):", error);
+    throw new Error(error.message);
+  }
+  return count ?? 0;
+}
+
+/**
+ * Fetches the evaluation report for a specific job.
+ */
+export async function getJobReport(
+  job_id: string,
+): Promise<{
+  evaluation_report: string | null;
+  company: string;
+  job_title: string;
+  legitimacy_tier: string | null;
+  archetype: string | null;
+  score_dimensions: Record<string, number> | null;
+  resume_score: number | null;
+  report_date: string | null;
+} | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("jobs")
+    .select(
+      "evaluation_report, company, job_title, legitimacy_tier, archetype, score_dimensions, resume_score, report_date",
+    )
+    .eq("job_id", job_id)
+    .single();
+
+  if (error && error.code !== "PGRST116") {
+    console.error("Supabase error fetching job report:", error);
+    throw new Error(error.message);
+  }
+  return data;
 }

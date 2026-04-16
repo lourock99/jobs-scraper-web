@@ -201,11 +201,22 @@ export default function TopMatchesList({
     }
   };
 
-  // Function to determine badge color based on resume score
+  // Provider display name mapping
+  const providerName: Record<string, string> = {
+    linkedin: "LinkedIn",
+    jsearch: "JSearch",
+    usajobs: "USAJobs",
+    careers_future: "MyCareersFuture",
+    greenhouse: "Greenhouse",
+    ashby: "Ashby",
+    lever: "Lever",
+  };
+
+  // Function to determine badge color based on resume score (0-100 scale)
   const getScoreBadgeColor = (score: number) => {
-    if (score >= 0.8) return "bg-green-100 text-green-800 border-green-300";
-    if (score >= 0.6) return "bg-blue-100 text-blue-800 border-blue-300";
-    if (score >= 0.4) return "bg-yellow-100 text-yellow-800 border-yellow-300";
+    if (score >= 80) return "bg-green-100 text-green-800 border-green-300";
+    if (score >= 60) return "bg-blue-100 text-blue-800 border-blue-300";
+    if (score >= 40) return "bg-yellow-100 text-yellow-800 border-yellow-300";
     return "bg-gray-100 text-gray-800 border-gray-300";
   };
 
@@ -263,9 +274,7 @@ export default function TopMatchesList({
                       <div className="mt-1 flex items-center text-xs text-gray-400">
                         <SocialLink className="h-3 w-3 mr-1 flex-shrink-0" />
                         <span className="capitalize truncate">
-                          {job.provider === "careers_future"
-                            ? "MyCareersFuture"
-                            : "LinkedIn"}
+                          {providerName[job.provider] || job.provider}
                         </span>
                       </div>
                     </div>
@@ -342,9 +351,7 @@ export default function TopMatchesList({
                     <div className="flex items-center">
                       <SocialLink className="h-4 w-4 mr-1.5 text-gray-500" />
                       <span className="capitalize truncate">
-                        {selectedJob.provider === "careers_future"
-                          ? "MyCareersFuture"
-                          : "LinkedIn"}
+                        {providerName[selectedJob.provider] || selectedJob.provider}
                       </span>
                     </div>
                   </div>
@@ -378,10 +385,13 @@ export default function TopMatchesList({
                 {(() => {
                   // Determine the job listing URL based on the provider
                   let jobUrl;
-                  if (selectedJob.provider === "careers_future") {
+                  if (selectedJob.url) {
+                    jobUrl = selectedJob.url;
+                  } else if (selectedJob.provider === "careers_future") {
                     jobUrl = `https://www.mycareersfuture.gov.sg/job/${selectedJob.job_id}`;
+                  } else if (selectedJob.provider === "usajobs") {
+                    jobUrl = `https://www.usajobs.gov/job/${selectedJob.job_id}`;
                   } else {
-                    // Default to LinkedIn for "linkedin" provider or any other/undefined provider
                     jobUrl = `https://www.linkedin.com/jobs/view/${selectedJob.job_id}`;
                   }
 
